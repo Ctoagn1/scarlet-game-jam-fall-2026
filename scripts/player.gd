@@ -1,8 +1,7 @@
 extends AnimatedSprite2D
 
-@export var TILEMAP: TileMapLayer
 var pos = Vector2i(0, 0)
-var parent_node
+
 
 var moved = false;
 
@@ -12,8 +11,7 @@ var newpos = Vector2i(0, 0)
 var oldpos = global_position
 
 func _ready() -> void:
-	global_position = TILEMAP.map_to_local(Vector2i(0, 0))
-	parent_node = get_parent()
+	global_position = Grid.map_to_local(Vector2i(0, 0))
 
 	
 func _physics_process(delta: float) -> void:
@@ -27,39 +25,32 @@ func _physics_process(delta: float) -> void:
 		
 func _process(_delta: float) -> void:
 
-	if(parent_node.is_on_beat() && !moved):
+	if(Grid.is_on_beat() && !moved):
 		if Input.is_action_pressed("DownLeft"):
-			if parent_node.in_bounds(pos + (Vector2i(-1, 1) if (pos.x % 2 == 0) else Vector2i(-1, 0))):
-				pos = pos + (Vector2i(-1, 1)  if (pos.x % 2 == 0) else Vector2i(-1, 0))
+				pos = Grid.move_down_left(pos)
 				moved = true
 		elif Input.is_action_pressed("UpLeft"):
-			if parent_node.in_bounds(pos + (Vector2i(-1, 0) if (pos.x % 2 == 0) else Vector2i(-1, -1))):
-				pos = pos + (Vector2i(-1, 0) if (pos.x % 2 == 0) else Vector2i(-1, -1))
+				pos = Grid.move_up_left(pos)
 				moved = true
 		elif Input.is_action_pressed("UpRight"):
-			if parent_node.in_bounds(pos + (Vector2i(1, 0) if (pos.x % 2 == 0) else Vector2i(1, -1))):
-				pos = pos + (Vector2i(1, 0) if (pos.x % 2 == 0) else Vector2i(1, -1))
+				pos = Grid.move_up_right(pos)
 				moved = true
 		elif Input.is_action_pressed("DownRight"):
-			if parent_node.in_bounds(pos + (Vector2i(1, 1) if (pos.x % 2 == 0) else Vector2i(1, 0))):
-				pos = pos + (Vector2i(1, 1) if (pos.x % 2 == 0) else Vector2i(1, 0))
+				pos = Grid.move_down_right(pos)
 				moved = true
 		elif Input.is_action_pressed("Up"):
-			if parent_node.in_bounds(pos + (Vector2i(0, -1))):
-				pos = pos + (Vector2i(0, -1))
+				pos = Grid.move_up(pos)
 				moved = true
 		elif Input.is_action_pressed("Down"):
-			if parent_node.in_bounds(pos + Vector2i(0, 1)):
-				pos = pos + Vector2i(0, 1)
+				pos = Grid.move_down(pos)
 				moved = true
 		if (moved):	
 			in_motion = true;
 			oldpos = global_position
-			newpos = TILEMAP.map_to_local(pos)
+			newpos = Grid.map_to_local(pos)
 	else:
-		if Input.is_action_pressed("Down") || Input.is_action_pressed("Up") || Input.is_action_pressed("Left") || Input.is_action_pressed("Right"):
-			print_debug("boo you suck at timing")
-		if (!parent_node.is_on_beat()):
-			print_debug("can move again")
+		if Input.is_action_pressed("Down") || Input.is_action_pressed("UpLeft") || Input.is_action_pressed("DownLeft") || Input.is_action_pressed("UpRight") || Input.is_action_pressed("Up") || Input.is_action_pressed("UpLeft"):
+			moved = true
+		elif (!Grid.is_on_beat()):
 			moved = false
 		
